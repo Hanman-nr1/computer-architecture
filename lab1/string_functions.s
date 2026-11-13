@@ -2,11 +2,11 @@
 #
 #  KURS: 1DT093 2023.  Computer Architecture
 #	
-# DATUM:
+# DATUM: 2026-11-13
 #
-#  NAMN:			
+#  NAMN: Hannes Eriksson			
 #
-#  NAMN:
+#  NAMN: Tomas Rosander
 #
 ##############################################################################
 
@@ -44,13 +44,13 @@ for_all_in_array:
 
 	#### Append a MIPS-instruktion before each of these comments
 	
-	# Done if i == N
-	# 4*i
-	# address = ARRAY + 4*i
-	# n = A[i]
-       	# Sum = Sum + n
-        # i++ 
-  	# next element
+	beq $t0, $a1, end_for_all # Done if i == N
+	sll $t1, $t0, 2 # 4*i
+	add $t2, $a0, $t1 # address = ARRAY + 4*i
+	lw $t3, 0($t2) # n = A[i]
+       	add $v0, $v0, $t3 # Sum = Sum + n
+        addi $t0, $t0, 1 # i++ 
+  	j for_all_in_array # next element
 	
 end_for_all:
 	
@@ -71,6 +71,21 @@ string_length:
 
 	#### Write your solution here ####
 	
+	add $t0, $0, $0
+	add $v0, $0, $0
+	
+string_inspector:	
+	
+	lbu $t1, 0($a0) # Loads thee character from the string
+	beq $t1, $0, string_counter # Done when the whole string has been counted
+	
+	addi $t0, $t0, 1
+	addi $a0, $a0, 1
+	
+	j string_inspector
+	
+string_counter:
+	add $v0, $t0, $0
 	jr	$ra
 	
 ##############################################################################
@@ -111,6 +126,18 @@ to_upper:
     
 	jr	$ra
 
+
+##############################################################################
+#
+#  DESCRIPTION: When given a string such as “ABC” as input it should produce “CBA” as the output.
+#	
+#        INPUT: $a0 - address of a character 
+#	 
+##############################################################################
+
+reverse_string:
+	
+	
 
 ##############################################################################
 #
