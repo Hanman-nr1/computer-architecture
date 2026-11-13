@@ -1,0 +1,33 @@
+# MARS (MIPS Assembler and Runtime Simulator)
+Mars*.jar
+*.dump
+*.hex
+*.bin
+*.mif
+*.coe
+
+# Assembler / Linker outputs (if using external tools)
+*.o
+*.obj
+*.out
+*.elf
+*.lst
+*.sym
+*.map
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# Editors & IDEs (e.g., VS Code for editing .asm/.s files)
+.vscode/
+.idea/
+
+# Operating System files
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
