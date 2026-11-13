@@ -71,21 +71,21 @@ string_length:
 
 	#### Write your solution here ####
 	
-	add $t0, $0, $0
-	add $v0, $0, $0
+	add $t0, $0, $0 # Set index i to ero
+	add $v0, $0, $0 # Set length to zero
 	
 string_inspector:	
 	
 	lbu $t1, 0($a0) # Loads thee character from the string
 	beq $t1, $0, string_counter # Done when the whole string has been counted
 	
-	addi $t0, $t0, 1
-	addi $a0, $a0, 1
+	addi $t0, $t0, 1 # Move index i up one step
+	addi $a0, $a0, 1 # Move the adress up one step
 	
 	j string_inspector
 	
 string_counter:
-	add $v0, $t0, $0
+	add $v0, $t0, $0 # Set $v0 to the value of index i
 	jr	$ra
 	
 ##############################################################################
@@ -137,6 +137,38 @@ to_upper:
 
 reverse_string:
 	
+	addi $sp, $sp, -8 # Make space for 2 words on the stack
+	sw $ra, 4($sp) # Save the return adress on the stack
+	sw $a0, 0($sp) # saves the first charcter on the stack
+	
+	jal string_length # Calls the string_length which returns $v0
+	
+	lw $ra, 4($sp) # Loads from the stack
+	lw $a0, 0($sp)
+	addi $sp, $sp, 8 # Returns space to the stack
+	
+	add $t0, $a0, $v0 # Add the start and the length which the points to the word after the last char
+	
+	addi $t0, $t0, -1 # Points to the last char
+	
+loop:
+	bge $a0, $t0, end # if the start is eiher larger or the same as the end stop
+	
+	lbu $t1, 0($a0) # Loads the char from $a0 to $t1
+	lbu $t2, 0($t0)# same as above
+	
+	sb $t1, 0($t0) # Switches the char between the first and the last char
+	sb $t2, 0($a0)
+	
+	addi $t0, $t0, -1 # Moves the index down one step
+	addi $a0, $a0, 1 # Moves the index up one step
+	
+	j loop # Jumps to the beginneing of the loop
+	
+	
+	
+end:
+	jr $ra
 	
 
 ##############################################################################
