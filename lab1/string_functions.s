@@ -87,16 +87,40 @@ string_length:
 #
 ##############################################################################	
 string_for_each:
-
+	
 	addi	$sp, $sp, -4		# PUSH return address to caller
-	sw	$ra, 0($sp)
+	sw	$ra, 0($sp)	# Store return adress
 
 	#### Write your solution here ####
+	# PUSH $s0 and $s1
+	addi	$sp, $sp, -8
+	sw	$s0, 4($sp)
+	sw	$s1, 0($sp)
+	
+	# Keep arguments intact by saving to $s
+	add	$s0, $a0, $zero
+	add	$s1, $a1, $zero
+	
+	for_each_char:		# The loop for each char
+		lb	$t0, 0($s0)	# load current char
+		beq	$t0, $zero, end_for_each	# if char == null
+		add	$a0, $s0, $zero		# argument = adress of current char
+		jalr	$s1		# calls callback with argument $a0
+		addi	$s0, $s0, 1		# goes to next char
+		j for_each_char
+		
+	end_for_each:
+		# Load the $s varibles back
+		lw	$s1, 0($sp)
+		lw	$s0, 4($sp)
+		addi	$sp, $sp, 8
+	
 	
 	lw	$ra, 0($sp)		# Pop return address to caller
 	addi	$sp, $sp, 4		
 
 	jr	$ra
+
 
 ##############################################################################
 #
@@ -108,7 +132,14 @@ string_for_each:
 to_upper:
 
 	#### Write your solution here ####
+	lb 	$t0, 0($a0)		# $t0 = byte stored in adress $a0
+	blt	$t0, 'a', end_upper	# leave unchanged (ascii code for 'a')
+	bgt	$t0, 'z', end_upper	# leave unchanged (ascii code for 'z')
+	addi 	$t0, $t0, -32		# shift ascii code to lower case	
+	sb	$t0, 0($a0)		# Store character back into string
     
+end_upper:
+
 	jr	$ra
 
 
