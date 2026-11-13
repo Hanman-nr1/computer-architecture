@@ -2,11 +2,11 @@
 #
 #  KURS: 1DT093 2023.  Computer Architecture
 #	
-# DATUM:
+# DATUM: 2026-11-13
 #
-#  NAMN:			
+#  NAMN: Hannes Eriksson			
 #
-#  NAMN:
+#  NAMN: Tomas Rosander
 #
 ##############################################################################
 
@@ -44,13 +44,13 @@ for_all_in_array:
 
 	#### Append a MIPS-instruktion before each of these comments
 	
-	# Done if i == N
-	# 4*i
-	# address = ARRAY + 4*i
-	# n = A[i]
-       	# Sum = Sum + n
-        # i++ 
-  	# next element
+	beq $t0, $a1, end_for_all # Done if i == N
+	sll $t1, $t0, 2 # 4*i
+	add $t2, $a0, $t1 # address = ARRAY + 4*i
+	lw $t3, 0($t2) # n = A[i]
+       	add $v0, $v0, $t3 # Sum = Sum + n
+        addi $t0, $t0, 1 # i++ 
+  	j for_all_in_array # next element
 	
 end_for_all:
 	
@@ -71,6 +71,22 @@ string_length:
 
 	#### Write your solution here ####
 	
+	add $t0, $0, $0 # Set index i to ero
+	add $v0, $0, $0 # Set length to zero
+	
+string_inspector:	
+	
+	lbu $t1, 0($a0) # Loads thee character from the string
+	beq $t1, $0, string_counter # Done when the whole string has been counted
+	
+	addi $t0, $t0, 1 # Move index i up one step
+	addi $a0, $a0, 1 # Move the adress up one step
+	
+	j string_inspector
+	
+string_counter:
+	add $v0, $t0, $0 # Set $v0 to the value of index i
+
 	jr	$ra
 	
 ##############################################################################
@@ -115,12 +131,10 @@ string_for_each:
 		lw	$s0, 4($sp)
 		addi	$sp, $sp, 8
 	
-	
 	lw	$ra, 0($sp)		# Pop return address to caller
 	addi	$sp, $sp, 4		
 
 	jr	$ra
-
 
 ##############################################################################
 #
@@ -145,6 +159,50 @@ end_upper:
 
 ##############################################################################
 #
+#  DESCRIPTION: When given a string such as “ABC” as input it should produce “CBA” as the output.
+#	
+#        INPUT: $a0 - address of a character 
+#	 
+##############################################################################
+
+reverse_string:
+	
+	addi $sp, $sp, -8 # Make space for 2 words on the stack
+	sw $ra, 4($sp) # Save the return adress on the stack
+	sw $a0, 0($sp) # saves the first charcter on the stack
+	
+	jal string_length # Calls the string_length which returns $v0
+	
+	lw $ra, 4($sp) # Loads from the stack
+	lw $a0, 0($sp)
+	addi $sp, $sp, 8 # Returns space to the stack
+	
+	add $t0, $a0, $v0 # Add the start and the length which the points to the word after the last char
+	
+	addi $t0, $t0, -1 # Points to the last char
+	
+loop:
+	bge $a0, $t0, end # if the start is eiher larger or the same as the end stop
+	
+	lbu $t1, 0($a0) # Loads the char from $a0 to $t1
+	lbu $t2, 0($t0)# same as above
+	
+	sb $t1, 0($t0) # Switches the char between the first and the last char
+	sb $t2, 0($a0)
+	
+	addi $t0, $t0, -1 # Moves the index down one step
+	addi $a0, $a0, 1 # Moves the index up one step
+	
+	j loop # Jumps to the beginneing of the loop
+	
+	
+	
+end:
+	jr $ra
+	
+
+##############################################################################
+#
 # Strings used by main:
 #
 ##############################################################################
@@ -166,6 +224,9 @@ STR_for_each_ascii:
 
 STR_for_each_to_upper:
 	.asciiz "\n\nstring_for_each(str, to_upper)\n\n"	
+	
+STR_reverse_string:
+	.asciiz "\n\nreverse_string(str)\n\n"
 
 	.text
 	.globl main
@@ -253,11 +314,26 @@ main:
 	la	$a0, STR_str
 	jal	print_test_string
 	
+	##
+	### reverse_string(str)
+	##
+
+	li	$v0, 4
+	la	$a0, STR_reverse_string
+	syscall
+
+	la	$a0, STR_str
+	jal	reverse_string
+
+	la	$a0, STR_str
+	jal	print_test_string
+	
 	
 	lw	$ra, 0($sp)	# POP return address
 	addi	$sp, $sp, 4	
 	
-	jr	$ra
+	li $v0, 10	# Systemcall code exit
+	syscall
 
 ##############################################################################
 #
